@@ -1,0 +1,39 @@
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales
+venv/
+env/
+.venv/
+.env/
+
+# Archivos de Jupyter
+.ipynb_checkpoints/
+
+# Archivos de configuración local
+*.env
+*.DS_Store
+*.idea/
+*.vscode/
+
+# Archivos de salida
+*.log
+*.out
+*.aux
+*.pdf
+*.csv
+*.xlsx
+
+# Compilados C/C++
+*.so
+*.o
+*.dll
+*.exe
+
+# Otros
+.eggs/
+*.egg-info/
+dist/
+build/
