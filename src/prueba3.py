@@ -1,1 +1,0 @@
-año=int(input("coloca un año: "))
