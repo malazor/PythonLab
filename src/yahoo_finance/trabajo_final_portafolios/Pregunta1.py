@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import yfinance as yf
 
 # Leer archivo
 df = pd.read_excel("Datos trabajo.xlsx")
@@ -86,3 +87,8 @@ print(f"📌 Estadísticas del portafolio equiponderado:")
 print(f"Rendimiento esperado anual: {media_portafolio_anual:.4%}")
 print(f"Volatilidad anual: {volatilidad_portafolio_anual:.4%}")
 print(f"Sharpe ajustado (rf = 4.5%): {sharpe_portafolio:.4f}")
+
+
+# print(retornos_log.corr().round(4))
+resultado = retornos_log.cov().round(4)@pesos
+print(resultado)

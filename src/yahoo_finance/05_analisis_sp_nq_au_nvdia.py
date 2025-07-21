@@ -16,7 +16,7 @@ precio_round = precios.round(2)
 
 # ----------------------------------------------------------------------------------------------
 # Calcular retornos simple y logarítmicos
-retorno_simple = precios.pct_change() # pct_change() Cambio porcentual entre valores consecutivos
+retorno_simple = precios.pct_change()
 retorno = np.log(precios / precios.shift(1))
 
 # Elimina la primera fila que tiene NaN
@@ -48,7 +48,7 @@ print(retornos.corr().round(10))
 
 # ----------------------------------------------------------------------------------------------
 # Rendimiento del portafolio
-pesos = {"^GSPC":0.6, "^NDX":0.2, "GC=F": 0.2}
+pesos = {"^GSPC":0.3, "^NDX":0.5, "GC=F": 0.2}
 
 # Convertir a Serie con el mismo orden
 pesos_serie = pd.Series(pesos)
@@ -68,7 +68,7 @@ cov_diaria = retornos.cov()
 cov_anual = cov_diaria * 252
 
 # Asegúrate que el orden de los pesos coincida con el de las columnas
-pesos_array = np.array([0.6,0.2,0.2])
+pesos_array = np.array([0.3,0.5,0.2])
 
 # Varianza del portafolio
 var_portafolio = np.dot(pesos_array.T, np.dot(cov_anual, pesos_array))

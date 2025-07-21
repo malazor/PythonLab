@@ -3,7 +3,12 @@ import pandas as pd
 import numpy as np
 
 # Paso 1: Definir los activos del portafolio
-tickers = ["^GSPC", "^NDX", "GC=F"]  # S&P 500, Nasdaq 100, Oro
+tickers = [
+    "EURUSD=X", "JPY=X", "GBPUSD=X", "CHF=X", "AUDUSD=X",
+    "CAD=X", "NZDUSD=X", "CNY=X", "MXN=X", "BRL=X",
+    "EURGBP=X", "EURJPY=X"
+]
+
 
 # Paso 2: Descargar los datos desde el 01/01/2000 hasta hoy
 # datos es un DataFrame
@@ -16,7 +21,7 @@ precio_round = precios.round(2)
 
 # ----------------------------------------------------------------------------------------------
 # Calcular retornos simple y logarítmicos
-retorno_simple = precios.pct_change() # pct_change() Cambio porcentual entre valores consecutivos
+retorno_simple = precios.pct_change()
 retorno = np.log(precios / precios.shift(1))
 
 # Elimina la primera fila que tiene NaN
@@ -48,7 +53,10 @@ print(retornos.corr().round(10))
 
 # ----------------------------------------------------------------------------------------------
 # Rendimiento del portafolio
-pesos = {"^GSPC":0.6, "^NDX":0.2, "GC=F": 0.2}
+pesos = {
+    "EURUSD=X":0.083333, "JPY=X":0.083333, "GBPUSD=X":0.083333, "CHF=X":0.083333, "AUDUSD=X":0.083333,
+    "CAD=X":0.083333, "NZDUSD=X":0.083333, "CNY=X":0.083333, "MXN=X":0.083333, "BRL=X":0.083333,
+    "EURGBP=X":0.083333, "EURJPY=X":0.083333}
 
 # Convertir a Serie con el mismo orden
 pesos_serie = pd.Series(pesos)
@@ -68,7 +76,8 @@ cov_diaria = retornos.cov()
 cov_anual = cov_diaria * 252
 
 # Asegúrate que el orden de los pesos coincida con el de las columnas
-pesos_array = np.array([0.6,0.2,0.2])
+pesos_array = np.array([0.083333, 0.083333, 0.083333, 0.083333, 0.083333, 0.083333,
+ 0.083333, 0.083333, 0.083333, 0.083333, 0.083333, 0.083333])
 
 # Varianza del portafolio
 var_portafolio = np.dot(pesos_array.T, np.dot(cov_anual, pesos_array))
