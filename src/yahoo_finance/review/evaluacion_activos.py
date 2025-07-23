@@ -8,13 +8,13 @@ def hr(titulo, ancho=50, caracter='-'):
 
 
 # Paso 1: Definir los activos del portafolio
-activos = ["QQQ", "^NDX"]
+activos = ["META", "ES=F","ROBT"]
 
 RF = 4.5
 
 # Paso 2: Descargar los datos desde el 01/01/2000 hasta hoy
 # datos es un DataFrame
-datos = yf.download(activos, start="2025-01-01")
+datos = yf.download(activos, start="2020-01-01")
 
 # Paso 3: Extraer solo los precios de cierre ajustado
 # Esto devuelve un DataFrame con las 3 columnas

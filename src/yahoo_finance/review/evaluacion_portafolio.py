@@ -4,9 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # ----- Configuración -----
-activos = ["SPY", "IDEV", "EMXC", "MCHI", "GOVT", "GLD"]
+activos = ["META", "ES=F","ROBT"]
 
-inicio = "2022-01-01"
+inicio = "2020-01-01"
 rf_anual = 0.045  # Tasa libre de riesgo en proporción
 
 # ----- Descargar precios -----
