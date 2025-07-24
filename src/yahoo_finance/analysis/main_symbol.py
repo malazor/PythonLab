@@ -7,7 +7,7 @@ import yfinance as yf
 import re
 
 
-from utils.utils import clean_name
+from src.yahoo_finance.utils.utils import clean_name
 
 
 def read_csv(symbol, start_date, end_date, ticker_interval):
@@ -67,7 +67,12 @@ def read_csv(symbol, start_date, end_date, ticker_interval):
         # Warning datos desactualizados
         # Obtener fecha de creación del archivo
 
-        timestamp_creacion = os.path.getctime(ruta_csv)
+        # Fecha de creacion
+        # timestamp_creacion = os.path.getctime(ruta_csv)
+
+        # Fecha de creacion
+        timestamp_creacion = os.path.getmtime(ruta_csv)
+
         fecha_creacion = datetime.fromtimestamp(timestamp_creacion).date()
         fecha_hoy = datetime.today().date()
 
@@ -76,6 +81,7 @@ def read_csv(symbol, start_date, end_date, ticker_interval):
             print("\n⚠️⚠️⚠️  ADVERTENCIA IMPORTANTE  ⚠️⚠️⚠️")
             print(f"🗂️ Fecha de creación del archivo: {fecha_creacion}")
             print(f"📅 Fecha actual: {fecha_hoy}")
+            print(f"📅 Archivo: {ruta_csv}")
             print("🟥 El archivo no está actualizado. Se recomienda ejecutar el módulo de descarga.\n")
         else:
             print("📁 Archivo actualizado al día de hoy.")
