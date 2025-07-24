@@ -8,7 +8,7 @@ def hr(titulo, ancho=50, caracter='-'):
 
 
 # Paso 1: Definir los activos del portafolio
-activos = ["META", "ES=F","ROBT"]
+activos = ["NVDA"]
 
 RF = 4.5
 
