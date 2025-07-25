@@ -4,8 +4,11 @@ import numpy as np
 import re
 import os
 from time import sleep
+from src.yahoo_finance.utils.utils import clean_name
+import argparse
+from datetime import datetime
 
-def save_historical_ticker(symbol, ticker_interval):
+def save_historical_ticker(symbol, start_date, end_date, ticker_interval):
     ticker = yf.Ticker(symbol)
 
     info = ticker.info
@@ -13,7 +16,7 @@ def save_historical_ticker(symbol, ticker_interval):
     file_name = info.get("longName",symbol)
     file_name = clean_name(file_name)+"_"+ticker_interval
 
-    data_history = ticker.history(start="2000-01-01", end="2025-07-23", interval=ticker_interval)
+    data_history = ticker.history(start=start_date, end=end_date, interval=ticker_interval)
 
     if data_history.empty:
         print("No existe data en el periodo indicado.")
@@ -44,27 +47,18 @@ def save_historical_ticker(symbol, ticker_interval):
         print(f"  - {file_name}.csv")
         # print(f"  - {file_name}.json")
 
-# ------------------------
-# Opción 1: input.txt
-# ------------------------
-def get_symbol_from_txt(path="input.txt"):
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            symbol = f.readline().strip().upper()
-            if not symbol:
-                raise ValueError("El archivo está vacío.")
-            return symbol
-    except FileNotFoundError:
-        print("❌ Archivo input.txt no encontrado.")
-        return None    
-
 # 🧪 Ejemplo de uso
 if __name__ == "__main__":
+    # Fecha actual
+    today = datetime.today().date()
+    one_year_before = today.replace(year=today.year - 1)
 
-    symbol = get_symbol_from_txt()
-    interval = ["1mo","1d"]
+    parser = argparse.ArgumentParser(description="Lee y filtra un archivo CSV de datos financieros.")
 
-    if symbol:
-        for i in interval:
-            save_historical_ticker(symbol,i)  # Cambia por cualquier símbolo: MSFT, SPY, BTC-USD, etc.
-            sleep(2)
+    parser.add_argument("--symbol", required=True, type=str, help="Símbolo del activo (ej. AAPL)")
+    parser.add_argument("--start", type=str, default=str(one_year_before), help="Fecha de inicio (YYYY-MM-DD)")
+    parser.add_argument("--end", type=str, default=str(today), help="Fecha de fin (YYYY-MM-DD)")
+    parser.add_argument("--interval", type=str, default=str("1mo"), help="Puede ser 1mo o 1d")
+    args = parser.parse_args()
+
+    save_historical_ticker(args.symbol,args.start, args.end, args.interval)  # Cambia por cualquier símbolo: MSFT, SPY, BTC-USD, etc.
