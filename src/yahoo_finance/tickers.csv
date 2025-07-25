@@ -1,0 +1,20 @@
+Group;Company;Ticker;Name
+Technology;Nvidia;NVDA;Líder en IA y chips gráficos.
+Technology;Apple;AAPL;Estabilidad, innovación y marca fuerte.
+Technology;Microsoft;MSFT;Fuerte en cloud, IA y software empresarial.
+Technology;Alphabet (Google);GOOGL;Diversificada y fuerte en publicidad y IA.
+Technology;Amazon;AMZN;E-commerce + AWS (cloud).
+Technology;Meta Platforms;META;Enfocada en IA y realidad aumentada.
+Financtial;JPMorgan Chase;JPM;Sólido banco con diversificación.
+Financtial;Goldman Sachs;GS;Foco en banca de inversión.
+Financtial;Berkshire Hathaway;BRK.B;Holding diversificado con enfoque de valor.
+Energy;NextEra Energy;NEE;Renovables + dividendos.
+Energy;ExxonMobil;XOM;Tradicional pero rentable en petróleo/gas.
+Energy;Enphase Energy;ENPH;Energía solar con alto potencial de crecimiento.
+Health;Eli Lilly;LLY;Fuerte en medicamentos innovadores.
+Health;Pfizer;PFE;Gran farmacéutica (aunque ha estado volátil).
+Health;UnitedHealth;UNH;Seguros y servicios de salud.
+Consumer;Coca-Cola;KO;Estable, defensiva y buena en dividendos.
+Consumer;Procter & Gamble;PG;Productos de consumo básicos.
+Consumer;Tesla;TSLA;Controvertida pero disruptiva.
+Consumer;Nike;NKE;Marca global con crecimiento internacional.
