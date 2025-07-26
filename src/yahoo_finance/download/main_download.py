@@ -7,6 +7,27 @@ from time import sleep
 from src.yahoo_finance.utils.utils import clean_name
 import argparse
 from datetime import datetime
+import json
+
+def save_ticker_info(symbol):
+    ticker = yf.Ticker(symbol)
+
+    info = ticker.info
+
+    # Ruta del directorio que contiene el script
+    dir_script = os.path.dirname(os.path.abspath(__file__))
+
+    # Ruta al directorio padre (uno arriba)
+    parent_dir = os.path.dirname(dir_script)
+
+    # Se construye la ruta para que este dentro de la carpeta data
+    # Ruta de la carpeta "data" al mismo nivel que el script
+    data_folder = os.path.join(parent_dir, "data")
+
+    # Guardarlo como JSON en un archivo
+    with open(os.path.join(data_folder, f"{clean_name(info.get("longName",symbol))}.json"), "w", encoding="utf-8") as f:
+        json.dump(info, f, ensure_ascii=False, indent=4)
+
 
 def save_historical_ticker(symbol, start_date, end_date, ticker_interval):
     ticker = yf.Ticker(symbol)
@@ -62,3 +83,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     save_historical_ticker(args.symbol,args.start, args.end, args.interval)  # Cambia por cualquier símbolo: MSFT, SPY, BTC-USD, etc.
+    save_ticker_info(args.symbol)
