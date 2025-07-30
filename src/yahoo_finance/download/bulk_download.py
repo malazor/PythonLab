@@ -25,10 +25,14 @@ def bulk_download():
         df = pd.read_csv(ruta_csv, sep=";")
 
         for index, row in df.iterrows():
+            print(f"Descargando JSON {row['Ticker']} . . . ")
+            dl.save_ticker_info(row['Ticker'])
+            sleep(10)
             for body in interval:
-                dl.save_historical_ticker(row['Ticker'], "2000-01-01", today, str(body))
-                print(f"Descargando {row['Ticker']} con intervalo {str(body)}")
-                sleep(20)
+               print(f"Descargando {row['Ticker']} con intervalo {str(body)}")
+               dl.save_historical_ticker(row['Ticker'], "2000-01-01", today, str(body))
+               sleep(10)
+            
 
 # 🧪 Ejemplo de uso
 if __name__ == "__main__":
