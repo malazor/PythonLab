@@ -1,19 +1,39 @@
 Group;Company;Ticker;Name
-Technology;Nvidia;NVDA;L�der en IA y chips gr�ficos.
-Technology;Apple;AAPL;Estabilidad, innovaci�n y marca fuerte.
+Technology;Nvidia;NVDA;Líder en IA y chips gráficos.
+Technology;Apple;AAPL;Estabilidad, innovación y marca fuerte.
 Technology;Microsoft;MSFT;Fuerte en cloud, IA y software empresarial.
 Technology;Alphabet (Google);GOOGL;Diversificada y fuerte en publicidad y IA.
 Technology;Amazon;AMZN;E-commerce + AWS (cloud).
 Technology;Meta Platforms;META;Enfocada en IA y realidad aumentada.
-Financtial;JPMorgan Chase;JPM;S�lido banco con diversificaci�n.
-Financtial;Goldman Sachs;GS;Foco en banca de inversi�n.
+Financial;JPMorgan Chase;JPM;Sólido banco con diversificación.
+Financial;Goldman Sachs;GS;Foco en banca de inversión.
 Energy;NextEra Energy;NEE;Renovables + dividendos.
-Energy;ExxonMobil;XOM;Tradicional pero rentable en petr�leo/gas.
-Energy;Enphase Energy;ENPH;Energ�a solar con alto potencial de crecimiento.
+Energy;ExxonMobil;XOM;Tradicional pero rentable en petróleo/gas.
+Energy;Enphase Energy;ENPH;Energía solar con alto potencial de crecimiento.
 Health;Eli Lilly;LLY;Fuerte en medicamentos innovadores.
-Health;Pfizer;PFE;Gran farmac�utica (aunque ha estado vol�til).
+Health;Pfizer;PFE;Gran farmacéutica (aunque ha estado volátil).
 Health;UnitedHealth;UNH;Seguros y servicios de salud.
 Consumer;Coca-Cola;KO;Estable, defensiva y buena en dividendos.
-Consumer;Procter & Gamble;PG;Productos de consumo b�sicos.
+Consumer;Procter & Gamble;PG;Productos de consumo básicos.
 Consumer;Tesla;TSLA;Controvertida pero disruptiva.
 Consumer;Nike;NKE;Marca global con crecimiento internacional.
+Index;S&P 500;^GSPC;Índice amplio de acciones estadounidenses
+Index;Nasdaq 100;^NDX;Índice tecnológico de EE.UU.
+Index;MSCI World;URTH;ETF que sigue el índice global desarrollado
+Index;Vanguard Total World;VT;ETF global de renta variable
+Commodity;Gold;GLD;ETF que sigue el precio del oro
+Commodity;Crude Oil;USO;ETF que sigue el precio del petróleo WTI
+Commodity;Copper;CPER;ETF de cobre
+Sector;Tech Sector ETF;XLK;Sector tecnológico (ETF)
+Sector;Healthcare Sector ETF;XLV;Sector salud (ETF)
+Sector;Energy Sector ETF;XLE;Sector energía (ETF)
+Sector;Financial Sector ETF;XLF;Sector financiero (ETF)
+Sector;Consumer Staples ETF;XLP;Consumo básico (ETF)
+Sector;Industrial Sector ETF;XLI;Sector industrial (ETF)
+ETF;iShares MSCI Emerging Markets;EEM;ETF de mercados emergentes
+ETF;iShares Core S&P 500;IVV;ETF que replica el S&P 500
+ETF;Vanguard Total Stock Market;VTI;ETF del mercado accionario total de EE.UU.
+ETF;ARK Innovation ETF;ARKK;ETF enfocado en innovación y tecnología disruptiva
+ETF;iShares Global Clean Energy;ICLN;ETF de energía limpia global
+ETF;SPDR Gold Shares;GLD;ETF que replica el precio del oro
+ETF;Invesco QQQ Trust;QQQ;ETF que sigue el Nasdaq-100
