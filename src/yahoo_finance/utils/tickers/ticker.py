@@ -86,7 +86,7 @@ class Ticker:
     
     def get_last_update(self):
         tck = yf.Ticker(self.symbol)
-        df = tck.history(period=cons.DATE_INTERVAL, interval="1m")
+        df = tck.history(period=cons.DATE_INTERVAL, interval=cons.DATE_INTERVAL)
 
         # Mostrar el último valor
         ultimo_registro = df.tail(1)
