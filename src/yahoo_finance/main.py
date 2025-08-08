@@ -4,8 +4,7 @@ import numpy as np
 from src.yahoo_finance.utils.tickers.calculations import UtilsCalculations 
 import pandas as pd
 
-symbol = ["UNH"
-]
+symbol = ["UNH"]
 
 data = data = yf.download(symbol, start="2025-06-01", end="2025-08-08", interval="1d", group_by=symbol)
 
