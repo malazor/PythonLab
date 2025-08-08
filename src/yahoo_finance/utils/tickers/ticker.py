@@ -2,10 +2,11 @@ import pandas as pd
 from datetime import datetime
 import os
 import json
-from src.yahoo_finance.constants import DATA_DIR, SYMBOL_DICT_FILE, DATE_INTERVAL, MONTH_INTERVAL, DATE5_INTERVAL, WEEK_INTERVAL, YF_DATE, YF_CLOSE, FACTOR_DTM, FACTOR_DTW, FACTOR_DTY, FACTOR_MTY
 from src.yahoo_finance.utils.utils import clean_name, load_json
 import yfinance as yf
 import numpy as np
+import src.yahoo_finance.constants as cons
+from src.yahoo_finance.utils.tickers.calculations import UtilsCalculations
 
 
 class Ticker:
@@ -14,11 +15,16 @@ class Ticker:
         self.clean_name = clean_name(symbol)
         self.cfg_file = self.get_cfg_file_name()
         self.info = self.load_info()
+        self.name = self.info.get("longName",symbol)
+        self.sector = self.info[cons.YF_TICKET_INFO_SECTOR]
 
+        self.data_file = None
         self.history_data_1d = None
         self.history_data_5d = None
         self.history_data_1wk = None
         self.history_data_1mo = None
+
+        self.last_price = self.info[cons.YF_TICKET_INFO_REGULAR_MARKET_PRICE]
 
         self.returns = None
 
@@ -35,7 +41,7 @@ class Ticker:
 
         # Se construye la ruta para que este dentro de la carpeta data
         # Ruta de la carpeta "data" al mismo nivel que el script
-        data_file = os.path.join(parent_dir, DATA_DIR,SYMBOL_DICT_FILE)
+        data_file = os.path.join(parent_dir, cons.DATA_DIR,cons.SYMBOL_DICT_FILE)
 
         with open(data_file, 'r') as f:
             cfg_symbol=json.load(f)
@@ -50,14 +56,14 @@ class Ticker:
 
         # Se construye la ruta para que este dentro de la carpeta data
         # Ruta de la carpeta "data" al mismo nivel que el script
-        data_file = os.path.join(parent_dir, DATA_DIR,f"{self.cfg_file}.json")
+        data_file = os.path.join(parent_dir, cons.DATA_DIR,f"{self.cfg_file}.json")
 
         with open(data_file, 'r') as f:
             ticker_info=json.load(f)
 
         return ticker_info
 
-    def load_history(self,interval):
+    def load_history(self):
         # Ruta del directorio que contiene el script
         dir_script = os.path.dirname(os.path.abspath(__file__))
 
@@ -66,25 +72,26 @@ class Ticker:
 
         # Se construye la ruta para que este dentro de la carpeta data
         # Ruta de la carpeta "data" al mismo nivel que el script
-        data_file = os.path.join(parent_dir, DATA_DIR,f"{clean_name(self.info["longName"])}_{interval}.csv")
+        data_file_1mo = os.path.join(parent_dir, cons.DATA_DIR,f"{clean_name(self.info["longName"])}_{cons.MONTH_INTERVAL}.csv")
+        data_file_1d = os.path.join(parent_dir, cons.DATA_DIR,f"{clean_name(self.info["longName"])}_{cons.DATE_INTERVAL}.csv")
+        data_file_1wk = os.path.join(parent_dir, cons.DATA_DIR,f"{clean_name(self.info["longName"])}_{cons.WEEK_INTERVAL}.csv")
+        data_file_1d5 = os.path.join(parent_dir, cons.DATA_DIR,f"{clean_name(self.info["longName"])}_{cons.DATE5_INTERVAL}.csv")
 
-        if interval==DATE_INTERVAL:
-            self.history_data_1d = pd.read_csv(data_file, sep=",")
-        elif interval==MONTH_INTERVAL:
-            self.history_data_1mo = pd.read_csv(data_file, sep=",")
-        elif interval==WEEK_INTERVAL:
-            self.history_data_1wk = pd.read_csv(data_file, sep=",")
-        elif interval==DATE5_INTERVAL:
-            self.history_data_1d5 = pd.read_csv(data_file, sep=",")
+        self.data_file = clean_name(self.info["longName"])
+
+        self.history_data_1d = pd.read_csv(data_file_1d, sep=",")
+        self.history_data_1mo = pd.read_csv(data_file_1mo, sep=",")
+        self.history_data_1wk = pd.read_csv(data_file_1wk, sep=",")
+        self.history_data_1d5 = pd.read_csv(data_file_1d5, sep=",")
     
     def get_last_update(self):
         tck = yf.Ticker(self.symbol)
-        df = tck.history(period=DATE_INTERVAL, interval="1m")
+        df = tck.history(period=cons.DATE_INTERVAL, interval="1m")
 
         # Mostrar el último valor
         ultimo_registro = df.tail(1)
-        return ultimo_registro
-
+        return ultimo_registro[cons.YF_CLOSE].iloc[-1]
+    
     def get_filtered_data(self, start_date, end_date, interval):
 
         try:
@@ -92,49 +99,47 @@ class Ticker:
             dt_start_date=pd.to_datetime(start_date, utc=True)
             dt_end_date=pd.to_datetime(end_date, utc=True)
 
-            if (interval == DATE_INTERVAL):
-                self.load_history(DATE_INTERVAL)
+            self.load_history()
+            if (interval == cons.DATE_INTERVAL):
                 df = self.history_data_1d
-            elif (interval == MONTH_INTERVAL):
-                self.load_history(MONTH_INTERVAL)
+            elif (interval == cons.MONTH_INTERVAL):
                 df = self.history_data_1mo
-            elif (interval == WEEK_INTERVAL):
-                self.load_history(WEEK_INTERVAL)
+            elif (interval == cons.WEEK_INTERVAL):
                 df = self.history_data_1wk
-            elif (interval == DATE5_INTERVAL):
-                self.load_history(DATE5_INTERVAL)
+            elif (interval == cons.DATE5_INTERVAL):
                 df = self.history_data_1d5
 
-            df[YF_DATE] = pd.to_datetime(df[YF_DATE], errors="raise", utc=True)
+            df[cons.YF_DATE] = pd.to_datetime(df[cons.YF_DATE], errors="raise", utc=True)
 
-            data_filtered = df[(df[YF_DATE]>= dt_start_date) & (df[YF_DATE]<= dt_end_date)]
+            data_filtered = df[(df[cons.YF_DATE]>= dt_start_date) & (df[cons.YF_DATE]<= dt_end_date)]
             close_returns = self.calculate_diff_log(data_filtered)
             output["data"]= data_filtered
             output["returns_close"] = close_returns
 
-            output["return_mean"] = float(close_returns[YF_CLOSE].mean())
-            output["return_max"] = float(close_returns[YF_CLOSE].max())
-            output["return_min"] = float(close_returns[YF_CLOSE].min())
-            output["return_var"] = float(close_returns[YF_CLOSE].var())
-            output["return_std"] = float(close_returns[YF_CLOSE].std())
-            output["return_count"] = float(close_returns[YF_CLOSE].count())
+            output["return_mean"] = float(close_returns[cons.YF_CLOSE].mean())
+            output["return_max"] = float(close_returns[cons.YF_CLOSE].max())
+            output["return_min"] = float(close_returns[cons.YF_CLOSE].min())
+            output["return_var"] = float(close_returns[cons.YF_CLOSE].var())
+            output["return_std"] = float(close_returns[cons.YF_CLOSE].std())
+            output["return_count"] = float(close_returns[cons.YF_CLOSE].count())
 
-            if (interval == DATE_INTERVAL):
+            if (interval == cons.DATE_INTERVAL):
 
-                output["yearly_volatility"] = output["return_mean"]*FACTOR_DTY
-                output["monthly_volatility"] = output["return_mean"]*FACTOR_DTM
-                output["weekly_volatility"] = output["return_mean"]*FACTOR_DTW                
-            elif (interval == MONTH_INTERVAL):
-                output["yearly_volatility"] = output["return_mean"]*FACTOR_MTY
-                output["monthly_volatility"] = output["return_mean"]*FACTOR_DTM
-                output["weekly_volatility"] = output["return_mean"]*FACTOR_DTW                
-            elif (interval == WEEK_INTERVAL):
-                self.load_history(WEEK_INTERVAL)
-                df = self.history_data_1wk
-            elif (interval == DATE5_INTERVAL):
-                self.load_history(DATE5_INTERVAL)
-                df = self.history_data_1d5
+                output["yearly_return"] = UtilsCalculations.annualize_return(output["return_mean"])
+                output["monthly_return"] = UtilsCalculations.monthly_return_from_daily(output["return_mean"])
+                output["weekly_return"] = UtilsCalculations.weekly_return_from_daily(output["return_mean"])
 
+                output["yearly_volatility"] = UtilsCalculations.annualize_volatility(output["return_std"])
+                output["monthly_volatility"] = UtilsCalculations.monthly_volatility_from_daily(output["return_std"])
+                output["weekly_volatility"] = UtilsCalculations.weekly_volatility_from_daily(output["return_std"])
+            elif (interval == cons.MONTH_INTERVAL):
+                output["yearly_return"] = UtilsCalculations.annualize_return_from_monthly(output["return_mean"])
+                output["monthly_return"] = output["return_mean"]
+                output["weekly_return"] = UtilsCalculations.weekly_return_from_monthly(output["return_mean"])
+
+                output["yearly_volatility"] = UtilsCalculations.annualize_volatility_from_monthly(output["return_std"])
+                output["monthly_volatility"] = output["return_std"]
+                output["weekly_volatility"] = UtilsCalculations.weekly_volatility_from_monthly(output["return_std"])
 
             return output
 
@@ -147,17 +152,17 @@ class Ticker:
 
     def calculate_diff_log(self,input_series):
         df = input_series.copy()
-        df[YF_DATE] = pd.to_datetime(df[YF_DATE])
-        df = df.sort_values(YF_DATE)
+        df[cons.YF_DATE] = pd.to_datetime(df[cons.YF_DATE])
+        df = df.sort_values(cons.YF_DATE)
 
         # Calcular log-return
-        df[YF_CLOSE] = np.log(df[YF_CLOSE] / df[YF_CLOSE].shift(1))
+        df[cons.YF_CLOSE] = np.log(df[cons.YF_CLOSE] / df[cons.YF_CLOSE].shift(1))
 
         # Eliminar el primer valor NaN (por el shift)
-        df = df.dropna(subset=[YF_CLOSE])
+        df = df.dropna(subset=[cons.YF_CLOSE])
 
         # Devolver solo las columnas Date y Diff
-        return df[[YF_DATE, YF_CLOSE]]
+        return df[[cons.YF_DATE, cons.YF_CLOSE]]
     
     def calculate_diff_simple(input_series):
         output  = output.pct_change()
@@ -203,3 +208,13 @@ class Ticker:
             return (prices / prices.shift(1)).apply(lambda x: pd.np.log(x))
         else:
             return prices.pct_change()
+
+    def get_current_monthly_price(self):
+        return self.history_data_1mo[cons.YF_CLOSE].iloc[-1]
+    def get_previous_monthly_price(self):
+        return self.history_data_1mo[cons.YF_CLOSE].iloc[-2]
+
+    def get_current_daily_price(self):
+        return self.history_data_1d[cons.YF_CLOSE].iloc[-1]
+    def get_previous_daily_price(self):
+        return self.history_data_1d[cons.YF_CLOSE].iloc[-2]

@@ -100,7 +100,7 @@ def read_csv(symbol, start_date, end_date, ticker_interval):
 
         month_mean = returns["Close"].mean()
         month_std_dev = returns["Close"].std()
-        anual_mean = yearly_factor*returns["Close"].mean()
+        anual_mean = yearly_factor*(returns["Close"].mean())
         anual_std_dev = returns["Close"].std()*np.sqrt(yearly_factor)
         sharpe_rate = (anual_mean-RF)/anual_std_dev
 

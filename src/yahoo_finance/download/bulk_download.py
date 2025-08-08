@@ -27,11 +27,11 @@ def bulk_download():
         for index, row in df.iterrows():
             print(f"Descargando JSON {row['Ticker']} . . . ")
             dl.save_ticker_info(row['Ticker'])
-            sleep(10)
+            sleep(5)
             for body in interval:
                print(f"Descargando {row['Ticker']} con intervalo {str(body)}")
                dl.save_historical_ticker(row['Ticker'], "2000-01-01", today, str(body))
-               sleep(10)
+               sleep(5)
             
 
 # 🧪 Ejemplo de uso
