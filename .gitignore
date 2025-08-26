@@ -44,3 +44,4 @@ src/yahoo_finance/data/*.*
 # Excepciones
 !src/yahoo_finance/tickers.csv
 !src/Pandas/datos.csv
+!src/Pandas/curva_soberana.csv
