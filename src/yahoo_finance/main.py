@@ -3,10 +3,13 @@ from src.yahoo_finance.constants import DATE_INTERVAL, MONTH_INTERVAL, WEEK_INTE
 import numpy as np
 from src.yahoo_finance.utils.tickers.calculations import UtilsCalculations 
 import pandas as pd
+from time import sleep
 
-symbol = ["UNH"]
+symbol = [
+    "HG=F"
+]
 
-data = data = yf.download(symbol, start="2025-06-01", end="2025-08-08", interval="1d", group_by=symbol)
+data = yf.download(symbol, start="2021-12-01", end="2025-07-31", interval="1mo", group_by=symbol)
 
 resultados = []
 
@@ -17,7 +20,11 @@ for i in symbol:
     ultimo_precio = data[i]["Close"].iloc[-1]
     ratio = (ultimo_precio-minimo)/(maximo-minimo)
 
+    info = yf.Ticker(i).info
+
     resultados.append({
+#         "Sector": info["sector"],
+        "Name": info["shortName"],
         "Ticker": i,
         "Minimo:": minimo,
         "Maximo:": maximo,
@@ -29,5 +36,11 @@ for i in symbol:
     df_results_050 = df_results[df_results["Ratio"]<0.5].sort_values(by="Ratio", ascending=True)
     df_results_025 = df_results[df_results["Ratio"]<0.25].sort_values(by="Ratio", ascending=True)
 
-print(df_results_050)
-print(df_results_025)
+
+    sleep(2)
+
+data.to_csv("cobre.csv", index=True, sep=";")
+print (df_results_050)
+print (df_results_025)
+
+
