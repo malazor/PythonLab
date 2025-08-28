@@ -23,6 +23,7 @@ def update_ticker_dict():
 
     for idx, body in df.iterrows():
         symbol = body["Ticker"]
+        print(f"Descargando {symbol} . . . ")
         ticker = yf.Ticker(symbol)
         info = ticker.info
         output[symbol] = clean_name(info.get("longName",symbol))
