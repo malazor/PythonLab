@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 # Cargar datos (puede ser Excel o CSV)
 df = pd.read_csv("src/Pandas/datos.csv",sep=";")
 

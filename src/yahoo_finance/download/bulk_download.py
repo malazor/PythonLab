@@ -10,7 +10,8 @@ def bulk_download():
         
         today = datetime.today().date()
 
-        interval = ["1mo", "1wk", "5d", "1d"]
+#        interval = ["1mo", "1wk", "5d", "1d"]
+        interval = ["1d"]
 
         # Ruta del directorio actual (este script)
         dir_script = os.path.dirname(os.path.abspath(__file__))
