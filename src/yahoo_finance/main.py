@@ -5,15 +5,31 @@ from src.yahoo_finance.utils.tickers.calculations import UtilsCalculations
 import pandas as pd
 from time import sleep
 
-symbol = [
-    "HG=F"
+symbols = [
+"MINSURI1.LM",
+"TIN",
+"TINM.L",
+"LTIM.L",
+"GC=F",
+"GLD",
+"IAU",
+"HG=F",
+"COPA.L",
+"CPER.L"
 ]
 
-data = yf.download(symbol, start="2021-12-01", end="2025-07-31", interval="1mo", group_by=symbol)
-
+data = yf.download(
+    tickers=symbols,
+    start="2020-12-01",
+    end="2025-07-31",
+    interval="1mo",
+    group_by="ticker",  # Agrupa los datos por ticker
+    auto_adjust=True,   # Ajusta precios automáticamente por splits/dividendos
+    threads=True        # Descarga en paralelo
+)
 resultados = []
 
-for i in symbol:
+for i in symbols:
 
     minimo = data[i]["Low"].min()
     maximo = data[i]["High"].max()
@@ -39,7 +55,7 @@ for i in symbol:
 
     sleep(2)
 
-data.to_csv("cobre.csv", index=True, sep=";")
+data.to_csv("MINSUR.csv", index=True, sep=";")
 print (df_results_050)
 print (df_results_025)
 
