@@ -3,6 +3,9 @@ import pandas as pd
 
 import numpy as np
 
+import src.UP.Riesgos.utils.utils as utils
+
+
 SEED = 42
 np.random.seed(SEED)
 
@@ -26,7 +29,6 @@ df.index.name = "Fecha"
 df_monthly = df.resample("ME").last()
 df_monthly["diff"] = df_monthly["Close"].pct_change() * 100
 mean_diff, std_diff = df_monthly["diff"].mean(), df_monthly["diff"].std()
-
 
 # Guardar en CSV
 output_file = "USDPEN_cierre_mensual_historico.csv"
@@ -111,3 +113,6 @@ df_future.to_csv(output_file, index=True, date_format="%Y-%m-%d")
 # Guardar en CSV Total
 output_file = "USDPEN_cierre_mensual_completo.csv"
 df_extended.to_csv(output_file, index=True, date_format="%Y-%m-%d")
+
+# Llamar a la función del módulo
+resultados = utils.analizar_distribucion(df_monthly, col="Close")
