@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import src.UP.Riesgos.utils.utils as utils
+import yfinance as yf
 
 
 SEED = 42
@@ -26,13 +27,9 @@ df_monthly = df.resample("ME").last()
 df_monthly["diff"] = df_monthly["Close"].pct_change() * 100
 mean_diff, std_diff = df_monthly["diff"].mean(), df_monthly["diff"].std()
 
-# Guardar en CSV
-output_file = "USDPEN_cierre_mensual_historico.csv"
-df_monthly.to_csv(output_file, index=True, date_format="%Y-%m-%d")
-
-print(f"Archivo CSV generado: {output_file}")
-print(f"Media: {mean_diff}")
-print(f"Desviacion Std: {std_diff}")
+# print(f"Archivo CSV generado: {output_file}")
+#print(f"Media: {mean_diff}")
+#print(f"Desviacion Std: {std_diff}")
 
 future_dates = pd.date_range(start="2025-09-30", end="2031-12-31", freq="ME")
 
@@ -85,10 +82,10 @@ for i in range(n_iter):
         results.append(base_values)
     else:
         shocked_values = []
-        prev_value = base_values[0] * (1 + utils.generar_shock(mean_diff, std_diff)/100)
+        prev_value = base_values[0] * (1 + utils.generar_shock_normal(mean_diff, std_diff,SEED)/100)
         shocked_values.append(prev_value)
         for j in range(1, len(base_values)):
-            prev_value = prev_value * (1 + utils.generar_shock(mean_diff, std_diff)/100)
+            prev_value = prev_value * (1 + utils.generar_shock_normal(mean_diff, std_diff,SEED)/100)
             shocked_values.append(prev_value)
         results.append(shocked_values)
 
@@ -102,6 +99,10 @@ print(df_sim.median().to_frame(name="Mediana"))
 df_sim.to_csv("simulacion_usdpen.csv", index=False)
 
 
+# Guardar en CSV
+output_file = "USDPEN_cierre_mensual_historico.csv"
+df_monthly.to_csv(output_file, index=True, date_format="%Y-%m-%d")
+
 # Guardar en CSV Futuros
 output_file = "USDPEN_cierre_mensual_futuros.csv"
 df_future.to_csv(output_file, index=True, date_format="%Y-%m-%d")
@@ -112,3 +113,4 @@ df_extended.to_csv(output_file, index=True, date_format="%Y-%m-%d")
 
 # Llamar a la función del módulo
 resultados = utils.analizar_distribucion(df_monthly, col="Close")
+print(resultados)

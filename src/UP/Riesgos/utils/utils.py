@@ -4,8 +4,21 @@ import scipy.stats as stats
 import statsmodels.api as sm
 import pandas as pd
 
-def generar_shock(media, desvest, seed=SEED):
-    return np.random.normal(loc=media, scale=desvest)
+from pathlib import Path
+
+def leer_csv(path: Path) -> pd.DataFrame:
+    # sep=None permite inferir coma/; | utf-8-sig cubre BOM
+    return pd.read_csv(path, sep=None, engine="python", encoding="utf-8-sig", on_bad_lines="skip")
+
+def genera_csv(df, name):
+    # Guardar en CSV
+    output_file = name + ".csv"
+    df.to_csv(output_file, index=True, date_format="%Y-%m-%d")
+
+
+def generar_shock_normal(media, desvest, seed):
+    rng = np.random.default_rng(seed)
+    return rng.normal(loc=media, scale=desvest)
 
 def analizar_distribucion(df: pd.DataFrame, col: str = "Close"):
     """
