@@ -7,8 +7,6 @@ import yfinance as yf
 SEED = 42
 np.random.seed(SEED)
 
-
-
 # Descargar histórico diario de USDPEN desde Yahoo Finance
 ticker = "USDPEN=X"
 start_date = "2019-12-31"
@@ -97,7 +95,6 @@ print(df_sim.median().to_frame(name="Mediana"))
 
 # Exportar a CSV
 df_sim.to_csv("simulacion_usdpen.csv", index=False)
-
 
 # Guardar en CSV
 output_file = "USDPEN_cierre_mensual_historico.csv"

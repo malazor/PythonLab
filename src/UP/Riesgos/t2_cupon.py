@@ -89,7 +89,7 @@ def main():
         print("-"*30)
         print(k)
         print("-"*30)
-        print(df_sim.median().to_frame(name="Mediana"))        
+        print(df_sim.mean().to_frame(name="Media"))        
 
 
 
