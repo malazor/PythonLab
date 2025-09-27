@@ -45,6 +45,5 @@ src/yahoo_finance/data/*.*
 !src/yahoo_finance/tickers.csv
 !src/Pandas/datos.csv
 !src/Pandas/curva_soberana.csv
-
-!src/UR/Riesgos/output/*.csv
-!src/UR/Riesgos/data/*.csv
+!src/UP/Riesgos/output/*.*
+!src/UP/Riesgos/data/*.*

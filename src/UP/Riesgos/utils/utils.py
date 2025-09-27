@@ -99,3 +99,62 @@ def analizar_distribucion(df: pd.DataFrame, col: str = "Close"):
     print("- p < 0.05 → se rechaza la hipótesis nula (la distribución no encaja).")
 
     return resultados
+
+
+def simulacion(df_future, mean_diff, std_diff, SEED):
+    # Último día semestre de 2026
+    val_2026_1 = df_future.loc["2026-06-30", "Close"]
+
+    # Último día de 2026
+    val_2026_2 = df_future.loc["2026-12-31", "Close"]
+
+    # Último día semestre de 2027
+    val_2027_1 = df_future.loc["2027-06-30", "Close"]
+
+    # Último día de 2027
+    val_2027_2 = df_future.loc["2027-12-31", "Close"]
+
+    # Último día semestre de 2028
+    val_2028_1 = df_future.loc["2028-06-30", "Close"]
+
+    # Último día de 2028
+    val_2028_2 = df_future.loc["2028-12-31", "Close"]
+
+    # Último día semestre de 2029
+    val_2029_1 = df_future.loc["2029-06-30", "Close"]
+
+    # Último día de 2029
+    val_2029_2 = df_future.loc["2029-12-31", "Close"]
+
+    # Último día semestre de 2030
+    val_2030_1 = df_future.loc["2030-06-30", "Close"]
+
+    # Último día de 2030
+    val_2030_2 = df_future.loc["2030-12-31", "Close"]
+
+    # Simulación encadenada
+    base_values = [val_2026_1, val_2026_2, val_2027_1, val_2027_2, val_2028_1, val_2028_2, val_2029_1, val_2029_2, val_2030_1, val_2030_2]
+    years = ["2026-1", "2026-2", "2027-1", "2027-2", "2028-1", "2028-2", "2029-1", "2029-2", "2030-1", "2030-2"]
+
+    n_iter = 10000
+    results = []
+
+    for i in range(n_iter):
+        if i == 0:
+            # Iteración 0: valores base
+            results.append(base_values)
+        else:
+            shocked_values = []
+            prev_value = base_values[0] * (1 + generar_shock_normal(mean_diff, std_diff,SEED)/100)
+            shocked_values.append(prev_value)
+            for j in range(1, len(base_values)):
+                prev_value = prev_value * (1 + generar_shock_normal(mean_diff, std_diff,SEED)/100)
+                shocked_values.append(prev_value)
+            results.append(shocked_values)
+
+    # Crear DataFrame
+    df_sim = pd.DataFrame(results, columns=years)
+
+    return df_sim
+
+#   print(df_sim.median().to_frame(name="Mediana"))

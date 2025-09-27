@@ -45,6 +45,9 @@ def main():
         # Calculo e inclusion del campo Diff mensual
         df_monthly["Diff"] = df_monthly["Rate"].pct_change() * 100
 
+        # Genera CSV Historico
+        utils.genera_csv(df_monthly, f"{OUTPUT_DIR}/{k}_historico")
+
         # Calculo media y desviacion Diff
         mean_diff, std_diff = df_monthly["Diff"].mean(), df_monthly["Diff"].std()
 
@@ -75,12 +78,21 @@ def main():
 
         df_future[k] = pd.DataFrame(projections, columns=["Fecha", "Close", "diff"]).set_index("Fecha")
 
+        # Genera CSV Futuro
+        utils.genera_csv(df_future[k], f"{OUTPUT_DIR}/{k}_futuro")
+
+        # Genera Simulación
+        df_sim = utils.simulacion(df_future[k], mean_diff, std_diff, SEED)
+
+        utils.genera_csv(df_sim, f"{OUTPUT_DIR}/{k}_sim")
+
         print("-"*30)
         print(k)
-        print(df_future[k].tail(3))
+        print("-"*30)
+        print(df_sim.median().to_frame(name="Mediana"))        
 
 
-    utils.genera_csv(dfs["PEN_1Y"],f"{OUTPUT_DIR}/{k}")
+
 
 
 if __name__ == "__main__":
