@@ -82,7 +82,7 @@ def main():
         utils.genera_csv(df_future[k], f"{OUTPUT_DIR}/{k}_futuro")
 
         # Genera Simulación
-        df_sim = utils.simulacion(df_future[k], mean_diff, std_diff, SEED)
+        df_sim = utils.simulacion_cupon(df_future[k], mean_diff, std_diff, SEED)
 
         utils.genera_csv(df_sim, f"{OUTPUT_DIR}/{k}_sim")
 

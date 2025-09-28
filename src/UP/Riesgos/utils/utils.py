@@ -20,6 +20,12 @@ def generar_shock_normal(media, desvest, seed):
     rng = np.random.default_rng(seed)
     return rng.normal(loc=media, scale=desvest)
 
+def generar_shock_t(media, desvest, seed):
+    rng = np.random.default_rng(seed)
+#    return rng.normal(loc=media, scale=desvest)
+    return rng.standard_t(loc=media, scale=desvest)
+
+
 def analizar_distribucion(df: pd.DataFrame, col: str = "Close"):
     """
     Analiza la distribución de una serie en un DataFrame:
@@ -101,40 +107,92 @@ def analizar_distribucion(df: pd.DataFrame, col: str = "Close"):
     return resultados
 
 
-def simulacion(df_future, mean_diff, std_diff, SEED):
+def simulacion_tc(df_future, mean_diff, std_diff, SEED):
+    # Primer día 2026
+    # val_2026_1 = df_future.loc["2026-01-01", "Close"]
+
     # Último día semestre de 2026
-    val_2026_1 = df_future.loc["2026-06-30", "Close"]
+    val_2026_2 = df_future.loc["2026-06-30", "Close"]
 
     # Último día de 2026
-    val_2026_2 = df_future.loc["2026-12-31", "Close"]
+    val_2026_3 = df_future.loc["2026-12-31", "Close"]
+
+    # Primer día 2027
+    # val_2027_1 = df_future.loc["2027-01-01", "Close"]
 
     # Último día semestre de 2027
-    val_2027_1 = df_future.loc["2027-06-30", "Close"]
+    val_2027_2 = df_future.loc["2027-06-30", "Close"]
 
     # Último día de 2027
-    val_2027_2 = df_future.loc["2027-12-31", "Close"]
+    val_2027_3 = df_future.loc["2027-12-31", "Close"]
+
+    # Primer día 2028
+    # val_2028_1 = df_future.loc["2028-01-01", "Close"]
 
     # Último día semestre de 2028
-    val_2028_1 = df_future.loc["2028-06-30", "Close"]
+    val_2028_2 = df_future.loc["2028-06-30", "Close"]
 
     # Último día de 2028
-    val_2028_2 = df_future.loc["2028-12-31", "Close"]
+    val_2028_3 = df_future.loc["2028-12-31", "Close"]
 
-    # Último día semestre de 2029
-    val_2029_1 = df_future.loc["2029-06-30", "Close"]
+    # Primer día 2029
+    # val_2029_1 = df_future.loc["2029-01-01", "Close"]
+
+   # Último día semestre de 2029
+    val_2029_2 = df_future.loc["2029-06-30", "Close"]
 
     # Último día de 2029
-    val_2029_2 = df_future.loc["2029-12-31", "Close"]
+    val_2029_3 = df_future.loc["2029-12-31", "Close"]
+
+    # Primer día 2030
+    # val_2030_1 = df_future.loc["2030-01-01", "Close"]
 
     # Último día semestre de 2030
-    val_2030_1 = df_future.loc["2030-06-30", "Close"]
+    val_2030_2 = df_future.loc["2030-06-30", "Close"]
 
     # Último día de 2030
-    val_2030_2 = df_future.loc["2030-12-31", "Close"]
+    val_2030_3 = df_future.loc["2030-12-31", "Close"]
 
     # Simulación encadenada
-    base_values = [val_2026_1, val_2026_2, val_2027_1, val_2027_2, val_2028_1, val_2028_2, val_2029_1, val_2029_2, val_2030_1, val_2030_2]
+    base_values = [val_2026_2, val_2026_3, val_2027_2, val_2027_3, val_2028_2, val_2028_3, val_2029_2, val_2029_3, val_2030_2, val_2030_3]
     years = ["2026-1", "2026-2", "2027-1", "2027-2", "2028-1", "2028-2", "2029-1", "2029-2", "2030-1", "2030-2"]
+
+    n_iter = 10000
+    results = []
+
+    for i in range(n_iter):
+        if i == 0:
+            # Iteración 0: valores base
+            results.append(base_values)
+        else:
+            shocked_values = []
+            prev_value = base_values[0] * (1 + generar_shock_normal(mean_diff, std_diff,SEED)/100)
+            shocked_values.append(prev_value)
+            for j in range(1, len(base_values)):
+                prev_value = prev_value * (1 + generar_shock_normal(mean_diff, std_diff,SEED)/100)
+                shocked_values.append(prev_value)
+            results.append(shocked_values)
+
+    # Crear DataFrame
+    df_sim = pd.DataFrame(results, columns=years)
+
+    return df_sim
+
+#   print(df_sim.median().to_frame(name="Mediana"))
+
+def simulacion_cupon(df_future, mean_diff, std_diff, SEED):
+    # Último día semestre de 2026
+    val_2026_1 = df_future.loc["2026-01-31", "Close"]
+
+    # Último día semestre de 2027
+    val_2027_1 = df_future.loc["2027-01-31", "Close"]
+
+    # Último día semestre de 2028
+    val_2028_1 = df_future.loc["2028-01-31", "Close"]
+
+    # Simulación encadenada
+    base_values = [val_2026_1, val_2027_1, val_2028_1]
+    years = ["2026-1", "2027-1", "2028-1"]
 
     n_iter = 10000
     results = []
