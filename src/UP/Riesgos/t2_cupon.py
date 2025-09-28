@@ -23,7 +23,6 @@ def main():
     last_values = {}
     df_future = {}
 
-
     for k, fname in FILES.items():
 
         # Lectura del CSV
@@ -35,7 +34,7 @@ def main():
         df = df.set_index("Date")
 
         # Calculo e inclusion del campo Diff diario
-        df["Diff"] = df["Rate"].pct_change()*100
+        df["Diff"] = df["Rate"].pct_change()
         df = df.dropna(subset=["Diff"])
 
         # Agrupacion por mes
@@ -90,10 +89,6 @@ def main():
         print(k)
         print("-"*30)
         print(df_sim.mean().to_frame(name="Media"))        
-
-
-
-
 
 if __name__ == "__main__":
     main()

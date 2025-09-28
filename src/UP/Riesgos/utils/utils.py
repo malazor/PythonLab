@@ -166,10 +166,13 @@ def simulacion_tc(df_future, mean_diff, std_diff, SEED):
             results.append(base_values)
         else:
             shocked_values = []
-            prev_value = base_values[0] * (1 + generar_shock_normal(mean_diff, std_diff,SEED)/100)
+            shock=generar_shock_normal(mean_diff, std_diff,SEED)
+            prev_value = base_values[0] * (1 + shock/100)
             shocked_values.append(prev_value)
             for j in range(1, len(base_values)):
-                prev_value = prev_value * (1 + generar_shock_normal(mean_diff, std_diff,SEED)/100)
+                t_shock = generar_shock_normal(mean_diff, std_diff,SEED)
+                prev_value = prev_value * (1 + t_shock/100)
+                print(f"Prev value: {prev_value} - Shock: {shock}")
                 shocked_values.append(prev_value)
             results.append(shocked_values)
 
