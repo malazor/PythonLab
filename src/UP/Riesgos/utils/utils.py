@@ -237,22 +237,48 @@ def simulacion_cupon(df_future, mean_diff, std_diff, SEED):
 
 #   print(df_sim.median().to_frame(name="Mediana"))
 
-def generar_futures_usdpen(df_monthly, mean_diff, std_diff):
-    future_dates = pd.date_range(start="2025-08-31", end="2031-12-31", freq="ME")
+def generar_futures_usdpen(df_monthly, mean_diff, std_diff, start_date, end_date, idx, column1,column2, seed, freq):
+    future_dates = pd.date_range(start=start_date, end=end_date, freq=freq)
 
-    last_value = float(df_monthly["Close"].iloc[-1])
+    last_value = float(df_monthly[column1].iloc[-1])
 
     projections = []
     current_value = last_value
 
     for date in future_dates:
         temp = current_value
+    #    shock = generar_shock_normal(mean_diff, std_diff, seed)  # en %
         shock = np.random.normal(loc=mean_diff, scale=std_diff)  # en %
     #    current_value = last_value * (1 + shock/100)
         current_value = last_value * (1 + shock)
         last_diff = (current_value - temp)/current_value
         projections.append((date, current_value, last_diff))
 
-    df_future = pd.DataFrame(projections, columns=["Fecha", "Close", "diff"]).set_index("Fecha")
+    df_future = pd.DataFrame(projections, columns=[idx, column1, column2]).set_index(idx)
+
+    return df_future
+
+def generar_futures_cupon(df_monthly, mean_diff, std_diff, loc, scale, dfr, start_date, end_date, idx, column1,column2, dist, freq):
+    future_dates = pd.date_range(start=start_date, end=end_date, freq=freq)
+
+    last_value = float(df_monthly[column1].iloc[-1])
+
+    projections = []
+    current_value = last_value
+
+    for date in future_dates:
+        temp = current_value
+        if dist == "normal":
+            shock = np.random.normal(loc=mean_diff, scale=std_diff)
+        else:
+            # Ajustar la t para que tenga desviación std_diff
+            t_raw = np.random.standard_t(dfr)                           # muestra de la t
+            t_scaled = (t_raw / np.sqrt(dfr / (dfr - 2))) * std_diff    # escalarla a la desviación que quieras
+            shock = mean_diff + t_scaled      #    current_value = last_value * (1 + shock/100)
+        current_value = last_value * (1 + shock)
+        last_diff = (current_value - temp)/current_value
+        projections.append((date, current_value, last_diff))
+
+    df_future = pd.DataFrame(projections, columns=[idx, column1, column2]).set_index(idx)
 
     return df_future

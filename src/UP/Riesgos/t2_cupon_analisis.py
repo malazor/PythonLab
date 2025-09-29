@@ -2,23 +2,17 @@ from pathlib import Path
 import src.UP.Riesgos.utils.utils as utils
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+import scipy.stats as stats
 
 FILE_NAME="curva_usd_3"
+SEED = 42
+np.random.seed(SEED)
+
 
 OUTPUT_DIR = Path(__file__).resolve().parent / "output"
 INPUT_DIR = Path(__file__).resolve().parent / "data"
 
 def main():
-    # Descargar histórico diario de USDPEN desde Yahoo Finance
-    ticker = "USDPEN=X"
-    start_date = "2022-12-31"
-    end_date = "2025-08-31"
-    interval = "1d"
-
-    # df = utils.yfinance_download(ticker, start_date, end_date, interval)
-    # utils.genera_csv(df, f"{OUTPUT_DIR}/TC_USDPEN")
-
     df = utils.leer_csv(f"{INPUT_DIR}/{FILE_NAME}.csv", sep=";")
 
     df["Rate"] = df["Rate"].astype(float)
@@ -40,10 +34,33 @@ def main():
     df_monthly_begin = df_monthly_begin.dropna(subset=["diff"])
     mean_diff_begin, std_diff_begin = df_monthly_begin["diff"].mean(), df_monthly_begin["diff"].std()
 
-    # df = df["Close"]
+    df_monthly_mean = df.resample("ME").mean()
+    df_monthly_mean["diff"] = df_monthly_mean["Rate"].pct_change()
+    df_monthly_mean = df_monthly_mean.dropna(subset=["diff"])
+    mean_diff_mean, std_diff_mean = df_monthly_mean["diff"].mean(), df_monthly_mean["diff"].std()
 
-    # output = utils.analizar_distribucion(df_monthly_last,FILE_NAME, "diff")
-    # print(output)
+    # data = tu serie de datos en un array o columna de DataFrame
+    df_input = df_monthly_begin.copy()
+    col = "Rate"
+    dfr, loc, scale = stats.t.fit(df_input[col])
+
+    print(f"Grados de libertad (df): {dfr:.2f}")
+    print(f"Media: {loc:.4f}")
+    print(f"Escala: {scale:.4f}")
+
+
+    if FILE_NAME == "curva_pen_1" or FILE_NAME == "curva_pen_3":
+        print("Shock con distribucion normal")
+        df_monthly_future = utils.generar_futures_cupon(df_input, mean_diff_begin, std_diff_begin,
+                                                    loc, scale, dfr, "2025-08-01", "2031-12-31", "Date", "Rate", "diff", "normal","MS")
+    elif FILE_NAME == "curva_usd_1" or FILE_NAME == "curva_usd_3":
+        print("Shock con distribucion t-Student")
+        df_monthly_future = utils.generar_futures_cupon(df_input, mean_diff_begin, std_diff_begin,
+                                                    loc, scale, dfr, "2025-08-01", "2031-12-31", "Date", "Rate", "diff", "t-Student","MS")
+
+    df_extended = pd.concat([df_monthly_begin, df_monthly_future])
+
+    utils.genera_csv(df_extended, f"{OUTPUT_DIR}/{FILE_NAME}_completo")
 
     return 
 
