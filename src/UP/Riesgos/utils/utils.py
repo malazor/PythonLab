@@ -3,12 +3,20 @@ import matplotlib.pyplot as plt
 import scipy.stats as stats
 import statsmodels.api as sm
 import pandas as pd
+import yfinance as yf
 
 from pathlib import Path
 
-def leer_csv(path: Path) -> pd.DataFrame:
+def yfinance_download(ticker, start_date, end_date, interval):
+
+    # Bajamos precios diarios
+    df = yf.download(ticker, start=start_date, end=end_date, interval=interval)
+
+    return df
+
+def leer_csv(path: Path, sep) -> pd.DataFrame:
     # sep=None permite inferir coma/; | utf-8-sig cubre BOM
-    return pd.read_csv(path, sep=None, engine="python", encoding="utf-8-sig", on_bad_lines="skip")
+    return pd.read_csv(path, sep=sep, engine="python", encoding="utf-8-sig", on_bad_lines="skip")
 
 def genera_csv(df, name):
     # Guardar en CSV
@@ -20,13 +28,13 @@ def generar_shock_normal(media, desvest, seed):
     rng = np.random.default_rng(seed)
     return rng.normal(loc=media, scale=desvest)
 
-def generar_shock_t(media, desvest, seed):
+def generar_shock_t(dfr, loc, scale, seed):
     rng = np.random.default_rng(seed)
-#    return rng.normal(loc=media, scale=desvest)
-    return rng.standard_t(loc=media, scale=desvest)
+    valor = loc + scale * rng.standard_t(dfr)
 
+    return valor
 
-def analizar_distribucion(df: pd.DataFrame, col: str = "Close"):
+def analizar_distribucion(df: pd.DataFrame, title, col: str):
     """
     Analiza la distribución de una serie en un DataFrame:
     
@@ -62,7 +70,7 @@ def analizar_distribucion(df: pd.DataFrame, col: str = "Close"):
     plt.hist(data, bins=30, density=True, alpha=0.6, color="skyblue", edgecolor="black", label="Datos")
     plt.plot(x, stats.norm.pdf(x, mu, sigma), "r-", lw=2, label=f"Normal (μ={mu:.2f}, σ={sigma:.2f})")
     plt.plot(x, stats.t.pdf(x, df_t, loc_t, scale_t), "g--", lw=2, label=f"t-Student (df={df_t:.1f})")
-    plt.title(f"Exploración de distribución ({col})")
+    plt.title(f"Exploración de distribución ({title})")
     plt.xlabel(col)
     plt.ylabel("Densidad")
     plt.legend()
@@ -103,6 +111,14 @@ def analizar_distribucion(df: pd.DataFrame, col: str = "Close"):
     print("\nInterpretación rápida:")
     print("- p > 0.05 → no se rechaza la hipótesis nula (la distribución puede encajar).")
     print("- p < 0.05 → se rechaza la hipótesis nula (la distribución no encaja).")
+
+    # data = tu serie de datos en un array o columna de DataFrame
+    dfr, loc, scale = stats.t.fit(df[col])
+
+    print(f"Grados de libertad (df): {dfr:.2f}")
+    print(f"Media: {loc:.4f}")
+    print(f"Escala: {scale:.4f}")
+
 
     return resultados
 
@@ -167,12 +183,13 @@ def simulacion_tc(df_future, mean_diff, std_diff, SEED):
         else:
             shocked_values = []
             shock=generar_shock_normal(mean_diff, std_diff,SEED)
-            prev_value = base_values[0] * (1 + shock/100)
+            prev_value = base_values[0]  + shock
             shocked_values.append(prev_value)
             for j in range(1, len(base_values)):
                 t_shock = generar_shock_normal(mean_diff, std_diff,SEED)
-                prev_value = prev_value * (1 + t_shock/100)
-                print(f"Prev value: {prev_value} - Shock: {shock}")
+#                prev_value = prev_value * (1 + t_shock/100)
+                prev_value = base_values[j] + t_shock
+                #print(f"Prev value: {prev_value} - Shock: {shock}")
                 shocked_values.append(prev_value)
             results.append(shocked_values)
 
@@ -209,7 +226,7 @@ def simulacion_cupon(df_future, mean_diff, std_diff, SEED):
             prev_value = base_values[0] * (1 + generar_shock_normal(mean_diff, std_diff,SEED)/100)
             shocked_values.append(prev_value)
             for j in range(1, len(base_values)):
-                prev_value = prev_value * (1 + generar_shock_normal(mean_diff, std_diff,SEED)/100)
+                prev_value = base_values[j] * (1 + generar_shock_normal(mean_diff, std_diff,SEED)/100)
                 shocked_values.append(prev_value)
             results.append(shocked_values)
 
@@ -219,3 +236,23 @@ def simulacion_cupon(df_future, mean_diff, std_diff, SEED):
     return df_sim
 
 #   print(df_sim.median().to_frame(name="Mediana"))
+
+def generar_futures_usdpen(df_monthly, mean_diff, std_diff):
+    future_dates = pd.date_range(start="2025-08-31", end="2031-12-31", freq="ME")
+
+    last_value = float(df_monthly["Close"].iloc[-1])
+
+    projections = []
+    current_value = last_value
+
+    for date in future_dates:
+        temp = current_value
+        shock = np.random.normal(loc=mean_diff, scale=std_diff)  # en %
+    #    current_value = last_value * (1 + shock/100)
+        current_value = last_value * (1 + shock)
+        last_diff = (current_value - temp)/current_value
+        projections.append((date, current_value, last_diff))
+
+    df_future = pd.DataFrame(projections, columns=["Fecha", "Close", "diff"]).set_index("Fecha")
+
+    return df_future

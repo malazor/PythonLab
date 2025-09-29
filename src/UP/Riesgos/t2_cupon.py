@@ -38,11 +38,12 @@ def main():
         df = df.dropna(subset=["Diff"])
 
         # Agrupacion por mes
-        df_monthly = df.resample("ME").last()
+#        df_monthly = df.resample("ME").last()
+        df_monthly = df.resample("ME").mean()
         df_monthly = df_monthly.iloc[:-1] # Se elimina el mes de septiembre pq no esta completo
 
         # Calculo e inclusion del campo Diff mensual
-        df_monthly["Diff"] = df_monthly["Rate"].pct_change() * 100
+        df_monthly["Diff"] = df_monthly["Rate"].pct_change()
 
         # Genera CSV Historico
         utils.genera_csv(df_monthly, f"{OUTPUT_DIR}/{k}_historico")
@@ -69,13 +70,12 @@ def main():
 
         for date in future_dates:
             temp = current_value[k]
-
             shock = utils.generar_shock_normal(mean_diff, std_diff,SEED)
-            current_value[k] = current_value[k] * (1 + shock/100)
+            current_value[k] = current_value[k] + shock
             last_diff = (current_value[k] - temp)/current_value[k]
-            projections.append((date, current_value[k], last_diff))
+            projections.append((date, current_value[k], last_diff, shock))
 
-        df_future[k] = pd.DataFrame(projections, columns=["Fecha", "Close", "diff"]).set_index("Fecha")
+        df_future[k] = pd.DataFrame(projections, columns=["Fecha", "Close", "diff", "shock"]).set_index("Fecha")
 
         # Genera CSV Futuro
         utils.genera_csv(df_future[k], f"{OUTPUT_DIR}/{k}_futuro")
@@ -84,7 +84,6 @@ def main():
         df_sim = utils.simulacion_cupon(df_future[k], mean_diff, std_diff, SEED)
 
         utils.genera_csv(df_sim, f"{OUTPUT_DIR}/{k}_sim")
-
         print("-"*30)
         print(k)
         print("-"*30)

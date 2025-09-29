@@ -40,9 +40,9 @@ for date in future_dates:
     temp = current_value
     shock = np.random.normal(loc=mean_diff, scale=std_diff)  # en %
 #    current_value = last_value * (1 + shock/100)
-    current_value = last_value * (1 + shock/100)
+    current_value = last_value * (1 + shock)
     last_diff = (current_value - temp)/current_value
-    projections.append((date, current_value, shock))
+    projections.append((date, current_value, last_diff))
 
 df_future = pd.DataFrame(projections, columns=["Fecha", "Close", "diff"]).set_index("Fecha")
 
@@ -65,29 +65,6 @@ val_2030 = df_future.loc["2030-12-31", "Close"]
 
 # Último día de 2031
 val_2031 = df_future.loc["2031-12-31", "Close"]
-
-# Simulación encadenada
-# base_values = [val_2026, val_2027, val_2028, val_2029, val_2030, val_2031]
-# years = ["2026", "2027", "2028", "2029", "2030", "2031"]
-
-# n_iter = 10000
-# results = []
-
-# for i in range(n_iter):
-#     if i == 0:
-#         # Iteración 0: valores base
-#         results.append(base_values)
-#     else:
-#         shocked_values = []
-#         prev_value = base_values[0] * (1 + utils.generar_shock_normal(mean_diff, std_diff,SEED)/100)
-#         shocked_values.append(prev_value)
-#         for j in range(1, len(base_values)):
-#             prev_value = prev_value * (1 + utils.generar_shock_normal(mean_diff, std_diff,SEED)/100)
-#             shocked_values.append(prev_value)
-#         results.append(shocked_values)
-
-# Crear DataFrame
-# df_sim = pd.DataFrame(results, columns=years)
 
 df_sim = utils.simulacion_tc(df_future, mean_diff, std_diff, SEED)
 
