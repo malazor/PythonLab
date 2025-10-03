@@ -7,33 +7,40 @@ import yfinance as yf
 
 from pathlib import Path
 
+# Propósito general: Se conecta a Yahoo Finance, descarga data de un symbol en funcion a un periodo de tiempo y una periodicidad. Retorna un DataFrame.
 def yfinance_download(ticker, start_date, end_date, interval):
 
     # Bajamos precios diarios
     df = yf.download(ticker, start=start_date, end=end_date, interval=interval)
 
     return df
-
+# Proposito general: Lee un archivo CSV ubicado en la ruta indicada.
 def leer_csv(path: Path, sep) -> pd.DataFrame:
     # sep=None permite inferir coma/; | utf-8-sig cubre BOM
     return pd.read_csv(path, sep=sep, engine="python", encoding="utf-8-sig", on_bad_lines="skip")
 
+
+# Proposito general: Transforma un DataFrame a un CSV a partir de una ruta dada.
 def genera_csv(df, name):
     # Guardar en CSV
     output_file = name + ".csv"
     df.to_csv(output_file, index=True, date_format="%Y-%m-%d")
 
 
+# Proposito general: Retorna un shock de una distribucion normal a partir de una semilla, media y desviación estándar.
 def generar_shock_normal(media, desvest, seed):
     rng = np.random.default_rng(seed)
     return rng.normal(loc=media, scale=desvest)
 
+
+# Proposito general: Retorna un shock de una distribucion t-Student a partir de un diferencial, media, escala y semilla.
 def generar_shock_t(dfr, loc, scale, seed):
     rng = np.random.default_rng(seed)
     valor = loc + scale * rng.standard_t(dfr)
 
     return valor
 
+# Prpósito general: Muestra graficos e indicadores para evaluar si una serie tiene una distribucion normal o t-Student.
 def analizar_distribucion(df: pd.DataFrame, title, col: str):
     """
     Analiza la distribución de una serie en un DataFrame:
@@ -237,6 +244,7 @@ def simulacion_cupon(df_future, mean_diff, std_diff, SEED):
 
 #   print(df_sim.median().to_frame(name="Mediana"))
 
+# Proposito general: Proyecta los valores del tipo de cambio
 def generar_futures_usdpen(df_monthly, mean_diff, std_diff, start_date, end_date, idx, column1,column2, seed, freq):
     future_dates = pd.date_range(start=start_date, end=end_date, freq=freq)
 
@@ -258,6 +266,7 @@ def generar_futures_usdpen(df_monthly, mean_diff, std_diff, start_date, end_date
 
     return df_future
 
+# Proposito general: Proyecta los valores del cupon
 def generar_futures_cupon(df_monthly, mean_diff, std_diff, loc, scale, dfr, start_date, end_date, idx, column1,column2, dist, freq):
     future_dates = pd.date_range(start=start_date, end=end_date, freq=freq)
 

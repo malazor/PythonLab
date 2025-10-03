@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import scipy.stats as stats
 
-FILE_NAME="curva_usd_3"
+FILE_NAME="curva_PEN_1"
 SEED = 42
 np.random.seed(SEED)
 
